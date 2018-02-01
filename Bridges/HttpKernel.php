@@ -185,8 +185,14 @@ class HttpKernel implements BridgeInterface
             $class = SymfonyRequest::class;
         }
 
+        // Hotfix: if the body buffer size is smaller than 50Mib, let's convert it into a string so it can be read anytime
+        $body = $psrRequest->getBody();
+        if ($body->getSize() < 250 * 1024 * 1024) {
+            $body = (string) $body;
+        }
+
         /** @var SymfonyRequest $syRequest */
-        $syRequest = new $class($query, $post, $attributes = [], $_COOKIE, $uploadedFiles, $_SERVER, $psrRequest->getBody());
+        $syRequest = new $class($query, $post, $attributes = [], $_COOKIE, $uploadedFiles, $_SERVER,  $body);
 
         $syRequest->setMethod($method);
 
